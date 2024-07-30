@@ -189,12 +189,18 @@ class DbColumn:
 			return column_def
 
 		if self.fieldtype in ("Check", "Int"):
-			default_value = cint(self.default) or 0
-			column_def += f" not null default {default_value}"
+			if self.default in ["0000", "NULL"]:
+				pass
+			else:
+				default_value = cint(self.default) or 0
+				column_def += f" not null default {default_value}"
 
 		elif self.fieldtype in ("Currency", "Float", "Percent"):
-			default_value = flt(self.default) or 0
-			column_def += f" not null default {default_value}"
+			if self.default in ["0000", "NULL"]:
+				pass
+			else:
+				default_value = flt(self.default) or 0
+				column_def += f" not null default {default_value}"
 
 		elif (
 			self.default
@@ -294,7 +300,10 @@ class DbColumn:
 
 			else:
 				# NOTE float() raise ValueError when "" or None is passed
-				return float(current_def["default"]) != float(self.default)
+				if current_def["default"] in ["0000", "NULL"] or self.default in ["0000", "NULL"] :
+					return current_def["default"] != self.default
+				else:
+					return float(current_def["default"]) != float(self.default)
 		except TypeError:
 			return True
 

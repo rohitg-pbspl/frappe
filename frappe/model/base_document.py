@@ -381,13 +381,19 @@ class BaseDocument:
 					value = 1 if cint(value) else 0
 
 				elif df.fieldtype == "Int" and not isinstance(value, int):
-					value = cint(value)
+					if df.default in ["0000", "NULL"] and value is None:
+						pass
+					else:
+						value = cint(value)
 
 				elif df.fieldtype == "JSON" and isinstance(value, dict):
 					value = json.dumps(value, separators=(",", ":"))
 
 				elif df.fieldtype in float_like_fields and not isinstance(value, float):
-					value = flt(value)
+					if df.default in ["0000", "NULL"] and value is None:
+						pass
+					else:
+						value = flt(value)
 
 				elif (df.fieldtype in datetime_fields and value == "") or (
 					getattr(df, "unique", False) and cstr(value).strip() == ""
